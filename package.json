@@ -1,0 +1,26 @@
+{
+  "name": "@container-inc/mcp",
+  "version": "1.0.0",
+  "description": "MCP Server for Container Inc.",
+  "repository": "https://github.com/f-inc/containerinc-mcp",
+  "author": "Harry Bairstow <me@harryet.xyz>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.8.0",
+    "axios": "^1.8.4",
+    "simple-git": "^3.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.17",
+    "typescript": "^5.8.2"
+  }
+}
