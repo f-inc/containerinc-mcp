@@ -4,7 +4,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import axios from 'axios';
 import fs from 'fs/promises';
 import path from 'path';
-import { simpleGit, SimpleGit, RemoteWithRefs } from 'simple-git';
+import { simpleGit, RemoteWithRefs } from 'simple-git';
 
 interface GitHubDeviceResponse {
     device_code: string;
@@ -44,8 +44,8 @@ interface DeployArguments {
 class DeviceFlowServer {
     private server: Server;
     private tokenStorePath: string;
-    private git: SimpleGit;
     private deploymentApiUrl: string;
+    private githubClientId: string;
 
     constructor() {
         this.server = new Server(
@@ -60,9 +60,9 @@ class DeviceFlowServer {
             }
         );
 
-        this.deploymentApiUrl = process.env.DEPLOYMENT_API_URL || 'https://zeet.run';
+        this.deploymentApiUrl = process.env.DEPLOYMENT_API_URL || 'https://container.inc';
         this.tokenStorePath = path.join(process.env.HOME || process.env.USERPROFILE || '.', '.container-inc', 'session.json');
-        this.git = simpleGit({ baseDir: process.cwd() });
+        this.githubClientId = process.env.GITHUB_CLIENT_ID || 'Ov23liPEmmIO16ie9OFJ';
 
         this.setupTools();
     }
@@ -123,7 +123,7 @@ class DeviceFlowServer {
             const response = await axios.post<GitHubTokenResponse>(
                 'https://github.com/login/oauth/access_token',
                 {
-                    client_id: process.env.GITHUB_CLIENT_ID || 'Ov23liPEmmIO16ie9OFJ',
+                    client_id: this.githubClientId,
                     device_code: deviceCode,
                     grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
                 },
@@ -365,7 +365,7 @@ class DeviceFlowServer {
                         const response = await axios.post<GitHubDeviceResponse>(
                             'https://github.com/login/device/code',
                             {
-                                client_id: process.env.GITHUB_CLIENT_ID || 'Ov23liPEmmIO16ie9OFJ',
+                                client_id: this.githubClientId,
                                 scope: [
                                     'repo',
                                     'write:packages',
