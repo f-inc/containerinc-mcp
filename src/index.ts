@@ -38,7 +38,7 @@ interface DeploymentResponse {
 interface DeployArguments {
     folder: string;
     repository: string;
-    branch?: string;
+    port?: number;
 }
 
 class DeviceFlowServer {
@@ -272,12 +272,13 @@ class DeviceFlowServer {
         }
     }
 
-    private async deployToContainerInc(repoUrl: string): Promise<DeploymentResponse> {
+    private async deployToContainerInc(repoUrl: string, port: number = 80): Promise<DeploymentResponse> {
         try {
             const response = await axios.post(
                 `${this.deploymentApiUrl}/api/v1/deploy`,
                 {
-                    repository: repoUrl
+                    repository: repoUrl,
+                    port: port
                 },
                 {
                     headers: {
@@ -327,9 +328,9 @@ class DeviceFlowServer {
                                 type: 'string',
                                 description: 'GitHub repository URL or name (e.g., username/repo or https://github.com/username/repo)'
                             },
-                            branch: {
-                                type: 'string',
-                                description: 'Branch to deploy'
+                            port: {
+                                type: 'number',
+                                description: 'Port which is exposed on the container'
                             }
                         },
                         required: ['folder', 'repository']
@@ -528,7 +529,7 @@ class DeviceFlowServer {
 
                         // Create a new Git instance for the specified folder
                         const folderGit = simpleGit({ baseDir: absoluteFolderPath });
-                        const branch = args.branch || 'main';
+                        const branch = 'main';
 
                         // Check repository status
                         const status = await folderGit.status();
@@ -551,7 +552,12 @@ class DeviceFlowServer {
                         }
 
                         // Initiate deployment
-                        const deployment = await this.deployToContainerInc(repoUrl);
+                        const port = args.port !== undefined ? args.port : 80;
+                        if (typeof port !== 'number' || port < 1 || port > 65535) {
+                            throw new Error('Port must be a valid number between 1 and 65535');
+                        }
+
+                        const deployment = await this.deployToContainerInc(repoUrl, port);
 
                         return {
                             content: [{
