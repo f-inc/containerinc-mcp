@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/f-inc-containerinc-mcp-badge.png)](https://mseep.ai/app/f-inc-containerinc-mcp)
+
 # @container-inc/mcp
 
 MCP Server for deploying to [Container Inc.](https://container.inc)
